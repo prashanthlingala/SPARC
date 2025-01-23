@@ -1,6 +1,7 @@
 from typing import Dict, List
 import streamlit as st
 import pandas as pd
+import random
 from datetime import datetime, timedelta
 
 class AnalyticsManager:
@@ -8,39 +9,55 @@ class AnalyticsManager:
         # Initialize analytics data in session state
         if 'analytics_data' not in st.session_state:
             st.session_state.analytics_data = {
-                'twitter': [],
-                'email': [],
+                'twitter': self._generate_mock_twitter_data(),
+                'email': self._generate_mock_email_data(),
                 'overall': []
             }
     
-    def add_twitter_metrics(self, tweet_id: str, content: str, metrics: Dict):
-        """Add Twitter metrics for a post"""
-        data = {
-            'platform': 'Twitter',
-            'content_id': tweet_id,
-            'content_preview': content[:50] + '...',
-            'impressions': metrics.get('impressions', 0),
-            'clicks': metrics.get('clicks', 0),
-            'conversions': metrics.get('conversions', 0),
-            'roi': metrics.get('roi', 0.0),
-            'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        st.session_state.analytics_data['twitter'].append(data)
+    def _generate_mock_twitter_data(self):
+        """Generate realistic mock data for Twitter"""
+        data = []
+        for i in range(30):
+            date = datetime.now() - timedelta(days=i)
+            impressions = random.randint(1000, 5000)
+            clicks = random.randint(50, int(impressions * 0.1))  # 1-10% CTR
+            conversions = random.randint(5, int(clicks * 0.2))   # 5-20% conversion
+            roi = random.uniform(1.5, 4.0)  # 150-400% ROI
+            
+            data.append({
+                'platform': 'Twitter',
+                'content_id': f'tweet_{i}',
+                'content_preview': f'Engaging tweet about product features #{i}...',
+                'impressions': impressions,
+                'clicks': clicks,
+                'conversions': conversions,
+                'roi': roi,
+                'date': date.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        return data
     
-    def add_email_metrics(self, campaign_id: str, subject: str, metrics: Dict):
-        """Add email campaign metrics"""
-        data = {
-            'platform': 'Email',
-            'content_id': campaign_id,
-            'content_preview': subject,
-            'impressions': metrics.get('opens', 0),
-            'clicks': metrics.get('clicks', 0),
-            'conversions': metrics.get('conversions', 0),
-            'roi': metrics.get('roi', 0.0),
-            'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        st.session_state.analytics_data['email'].append(data)
-    
+    def _generate_mock_email_data(self):
+        """Generate realistic mock data for Email campaigns"""
+        data = []
+        for i in range(10):
+            date = datetime.now() - timedelta(days=i*3)
+            impressions = random.randint(5000, 15000)
+            clicks = random.randint(500, int(impressions * 0.15))  # 5-15% CTR
+            conversions = random.randint(50, int(clicks * 0.25))   # 10-25% conversion
+            roi = random.uniform(2.0, 5.0)  # 200-500% ROI
+            
+            data.append({
+                'platform': 'Email',
+                'content_id': f'email_{i}',
+                'content_preview': f'Monthly Newsletter #{i}',
+                'impressions': impressions,
+                'clicks': clicks,
+                'conversions': conversions,
+                'roi': roi,
+                'date': date.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        return data
+
     def show_analytics_dashboard(self):
         """Display analytics dashboard"""
         st.title("📊 Campaign Analytics")
@@ -80,28 +97,85 @@ class AnalyticsManager:
             df['date'] = pd.to_datetime(df['date'])
             df = df[df['date'] > date_filter]
             
-            # Show key metrics
-            st.header("Key Metrics")
-            metric1, metric2, metric3, metric4 = st.columns(4)
+            # Show key metrics in cards
+            st.markdown("### Key Performance Metrics")
             
-            with metric1:
+            # Create a custom card style
+            card_style = """
+            <style>
+                .metric-card {
+                    background-color: #f0f2f6;
+                    border-radius: 10px;
+                    padding: 20px;
+                    text-align: center;
+                    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                }
+                .metric-value {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #0066cc;
+                }
+                .metric-label {
+                    font-size: 16px;
+                    color: #666;
+                }
+            </style>
+            """
+            st.markdown(card_style, unsafe_allow_html=True)
+            
+            # Create metric cards
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
                 total_impressions = df['impressions'].sum()
-                st.metric("Total Impressions", f"{total_impressions:,}")
+                st.markdown(
+                    f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{total_impressions:,.0f}</div>
+                        <div class="metric-label">Total Impressions</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             
-            with metric2:
-                avg_ctr = (df['clicks'].sum() / df['impressions'].sum() * 100) if df['impressions'].sum() > 0 else 0
-                st.metric("Average CTR", f"{avg_ctr:.1f}%")
+            with col2:
+                avg_ctr = (df['clicks'].sum() / df['impressions'].sum() * 100)
+                st.markdown(
+                    f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{avg_ctr:.1f}%</div>
+                        <div class="metric-label">Click-Through Rate</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             
-            with metric3:
+            with col3:
                 total_conversions = df['conversions'].sum()
-                st.metric("Total Conversions", f"{total_conversions:,}")
+                st.markdown(
+                    f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{total_conversions:,.0f}</div>
+                        <div class="metric-label">Total Conversions</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             
-            with metric4:
-                avg_roi = df['roi'].mean()
-                st.metric("Average ROI", f"{avg_roi:.1f}%")
+            with col4:
+                avg_roi = df['roi'].mean() * 100
+                st.markdown(
+                    f"""
+                    <div class="metric-card">
+                        <div class="metric-value">{avg_roi:.1f}%</div>
+                        <div class="metric-label">Average ROI</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             
             # Show trends
-            st.header("Performance Trends")
+            st.markdown("### Performance Trends")
             tab1, tab2 = st.tabs(["Impressions & Clicks", "Conversions & ROI"])
             
             with tab1:
@@ -125,7 +199,7 @@ class AnalyticsManager:
                 )
             
             # Show detailed data
-            st.header("Campaign Details")
+            st.markdown("### Campaign Details")
             st.dataframe(
                 df[[
                     'platform', 'content_preview', 'impressions', 
