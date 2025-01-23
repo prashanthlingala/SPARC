@@ -27,14 +27,10 @@ class SocialMediaManager:
         self.twitter_enabled = TWITTER_AVAILABLE
         self.twitter_client = None
         
-        # Only show error if tweepy import failed
-        if not TWITTER_AVAILABLE:
-            st.error("Twitter functionality is not available. Please run: pip install tweepy==4.14.0")
-        
     def setup_twitter_auth(self, api_key: str, api_secret: str, access_token: str, access_token_secret: str):
         """Initialize Twitter API client"""
         if not self.twitter_enabled:
-            st.error("Twitter functionality is not available. Please install tweepy.")
+            st.warning("To enable Twitter functionality, please run: pip install tweepy==4.14.0")
             return False
         
         try:
