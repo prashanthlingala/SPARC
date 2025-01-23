@@ -15,8 +15,7 @@ class ContentGenerator:
             self.client = AzureOpenAI(
                 api_key=api_key,
                 azure_endpoint=azure_endpoint,
-                api_version=api_version,
-                http_client=None  # Explicitly set to None to avoid proxy issues
+                api_version=api_version
             )
             self.deployment_name = deployment_name
         except Exception as e:
