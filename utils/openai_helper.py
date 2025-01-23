@@ -1,19 +1,27 @@
 from openai import AzureOpenAI
 from typing import Dict
+import os
 
 class ContentGenerator:
     def __init__(self, 
                  api_key: str,
                  azure_endpoint: str,
-                 deployment_name: str = "gpt-4",
+                 deployment_name: str = "gpt-4o-mini",
                  api_version: str = "2024-02-15-preview"):
+        """Initialize the Azure OpenAI client"""
+        # Extract base URL from the full endpoint
+        base_url = azure_endpoint.split('/openai')[0]
         
-        self.client = AzureOpenAI(
-            api_key=api_key,
-            api_version=api_version,
-            azure_endpoint=azure_endpoint
-        )
-        self.deployment_name = deployment_name
+        try:
+            self.client = AzureOpenAI(
+                api_key=api_key,
+                azure_endpoint=base_url,
+                api_version=api_version
+            )
+            self.deployment_name = deployment_name
+        except Exception as e:
+            print(f"Error initializing Azure OpenAI client: {str(e)}")
+            raise
         
     def generate_content(self, 
                         campaign_goal: str,
@@ -21,25 +29,42 @@ class ContentGenerator:
                         content_type: str,
                         tone: str,
                         custom_prompt: str = None) -> str:
+        """Generate content using Azure OpenAI"""
+        if custom_prompt:
+            prompt = custom_prompt
+        else:
+            prompt = f"""
+            Generate content for a marketing campaign with the following details:
+            
+            Goal: {campaign_goal}
+            
+            Target Persona:
+            - Role: {persona['role']}
+            - Experience: {persona.get('experience', 'Not specified')}
+            - Technical Level: {persona.get('technical_proficiency', 'Not specified')}
+            
+            Content Type: {content_type}
+            Tone: {tone}
+            
+            Make the content engaging and relevant for the target persona.
+            """
         
-        prompt = custom_prompt if custom_prompt else self._create_prompt(
-            campaign_goal,
-            persona,
-            content_type,
-            tone
-        )
-        
-        response = self.client.chat.completions.create(
-            model=self.deployment_name,
-            messages=[
-                {"role": "system", "content": "You are an expert marketing content creator."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=1000
-        )
-        
-        return response.choices[0].message.content
+        try:
+            response = self.client.chat.completions.create(
+                model=self.deployment_name,
+                messages=[
+                    {"role": "system", "content": "You are an expert marketing content creator."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=500
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            print(f"Error generating content: {str(e)}")
+            return f"Error generating content: {str(e)}"
         
     def _create_prompt(self, goal, persona, content_type, tone):
         return f"""
