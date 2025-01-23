@@ -1,0 +1,14 @@
+campaign_craft_ai/
+├── app.py
+├── components/
+│   ├── __init__.py
+│   ├── campaign_planner.py
+│   ├── content_generator.py
+│   └── analytics.py
+├── utils/
+│   ├── __init__.py
+│   ├── ai_helpers.py
+│   └── data_processor.py
+├── config/
+│   └── config.yaml
+└── requirements.txt 
