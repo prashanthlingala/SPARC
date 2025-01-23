@@ -1,19 +1,27 @@
 from openai import AzureOpenAI
 from typing import Dict
+import os
 
 class ContentGenerator:
     def __init__(self, 
                  api_key: str,
                  azure_endpoint: str,
-                 deployment_name: str = "gpt-4",
+                 deployment_name: str = "gpt-4o-mini",
                  api_version: str = "2024-02-15-preview"):
+        """Initialize the Azure OpenAI client"""
+        # Extract base URL from the full endpoint
+        base_url = azure_endpoint.split('/openai')[0]
         
-        self.client = AzureOpenAI(
-            api_key=api_key,
-            azure_endpoint=azure_endpoint
-        )
-        self.deployment_name = deployment_name
-        self.api_version = api_version
+        try:
+            self.client = AzureOpenAI(
+                api_key=api_key,
+                azure_endpoint=base_url,
+                api_version=api_version
+            )
+            self.deployment_name = deployment_name
+        except Exception as e:
+            print(f"Error initializing Azure OpenAI client: {str(e)}")
+            raise
         
     def generate_content(self, 
                         campaign_goal: str,
@@ -21,7 +29,7 @@ class ContentGenerator:
                         content_type: str,
                         tone: str,
                         custom_prompt: str = None) -> str:
-        
+        """Generate content using Azure OpenAI"""
         if custom_prompt:
             prompt = custom_prompt
         else:
@@ -44,7 +52,6 @@ class ContentGenerator:
         try:
             response = self.client.chat.completions.create(
                 model=self.deployment_name,
-                api_version=self.api_version,
                 messages=[
                     {"role": "system", "content": "You are an expert marketing content creator."},
                     {"role": "user", "content": prompt}
