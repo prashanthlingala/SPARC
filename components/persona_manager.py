@@ -1,10 +1,12 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 import streamlit as st
 
 class PersonaManager:
     def __init__(self):
         if 'personas' not in st.session_state:
             st.session_state.personas = []
+        if 'content_history' not in st.session_state:
+            st.session_state.content_history = []
 
     def create_persona_form(self) -> Optional[Dict]:
         """Display form for creating a new persona"""
@@ -33,6 +35,7 @@ class PersonaManager:
             
             if submitted:
                 persona = {
+                    "id": len(st.session_state.personas) + 1,
                     "role": role,
                     "experience": experience,
                     "technical_proficiency": technical_proficiency,
@@ -40,6 +43,7 @@ class PersonaManager:
                     "pain_points": pain_points
                 }
                 st.session_state.personas.append(persona)
+                st.success(f"Persona '{role}' saved successfully!")
                 return persona
         return None
 

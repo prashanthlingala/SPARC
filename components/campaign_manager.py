@@ -1,5 +1,5 @@
 import streamlit as st
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 class CampaignManager:
     def __init__(self):

@@ -20,3 +20,11 @@ content_types:
   technical_documentation:
     system_prompt: "You are an expert technical writer specializing in data technologies."
     max_length: 2000 
+
+social_media:
+  twitter:
+    char_limit: 280
+  
+email:
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587 

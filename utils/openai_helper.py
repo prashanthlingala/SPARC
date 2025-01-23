@@ -19,9 +19,10 @@ class ContentGenerator:
                         campaign_goal: str,
                         persona: Dict,
                         content_type: str,
-                        tone: str) -> str:
+                        tone: str,
+                        custom_prompt: str = None) -> str:
         
-        prompt = self._create_prompt(
+        prompt = custom_prompt if custom_prompt else self._create_prompt(
             campaign_goal,
             persona,
             content_type,
