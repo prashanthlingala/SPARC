@@ -1,6 +1,5 @@
 from openai import AzureOpenAI
 from typing import Dict
-import os
 
 class ContentGenerator:
     def __init__(self, 
@@ -9,14 +8,15 @@ class ContentGenerator:
                  deployment_name: str = "gpt-4o-mini",
                  api_version: str = "2024-02-15-preview"):
         """Initialize the Azure OpenAI client"""
-        # Extract base URL from the full endpoint
-        base_url = azure_endpoint.split('/openai')[0]
-        
+        if not api_key or not azure_endpoint:
+            raise ValueError("Azure OpenAI API key and endpoint are required")
+            
         try:
             self.client = AzureOpenAI(
                 api_key=api_key,
-                azure_endpoint=base_url,
-                api_version=api_version
+                azure_endpoint=azure_endpoint,
+                api_version=api_version,
+                http_client=None  # Explicitly set to None to avoid proxy issues
             )
             self.deployment_name = deployment_name
         except Exception as e:
