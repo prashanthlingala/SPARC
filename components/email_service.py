@@ -3,6 +3,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import streamlit as st
 from typing import List, Dict, Optional
+from datetime import datetime
 
 class EmailService:
     def __init__(self, smtp_server: str, smtp_port: int):
@@ -30,6 +31,19 @@ class EmailService:
                 server.starttls()
                 server.login(self.sender_email, self.sender_password)
                 server.send_message(msg)
+            
+            # Add mock metrics (replace with real email service metrics)
+            mock_metrics = {
+                'opens': 0,
+                'clicks': 0,
+                'conversions': 0,
+                'roi': 0.0
+            }
+            st.session_state.analytics_manager.add_email_metrics(
+                f"email_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                subject,
+                mock_metrics
+            )
             
             return True
             

@@ -12,13 +12,14 @@ from components.persona_manager import PersonaManager
 from components.campaign_manager import CampaignManager
 from components.social_media_manager import SocialMediaManager
 from components.email_service import EmailService
+from components.analytics_manager import AnalyticsManager
 from utils.openai_helper import ContentGenerator
 from utils.config_loader import load_config
 from utils.db_manager import DatabaseManager
 
 # Must be the first Streamlit command
 st.set_page_config(
-    page_title="CampaignCraft AI",
+    page_title="Smart Personalised Automation for Remarkable Campaigns (S.P.A.R.C)",
     page_icon="🎯",
     layout="wide"
 )
@@ -58,15 +59,16 @@ class CampaignCraftAI:
             self.config["email"]["smtp_server"],
             self.config["email"]["smtp_port"]
         )
+        self.analytics_manager = AnalyticsManager()
         
     def main(self):
-        st.title("🎯 CampaignCraft AI")
+        st.title("Smart Personalised Automation for Remarkable Campaigns (S.P.A.R.C)")
         st.subheader("AI-Powered Marketing Campaign Content Generator")
         
         # Sidebar navigation
         with st.sidebar:
             st.header("Navigation")
-            page = st.radio("Go to", ["Create Persona", "Generate Content", "Content History"])
+            page = st.radio("Go to", ["Create Persona", "Generate Content", "Content History", "Analytics"])
         
         if page == "Create Persona":
             self.persona_manager.create_persona_form()
@@ -87,7 +89,7 @@ class CampaignCraftAI:
                 with st.spinner("Generating content..."):
                     content = self.content_generator.generate_content(
                         campaign_goal=campaign_data["campaign_goal"],
-                        persona=campaign_data["persona"],
+                        persona=campaign_data["personas"][0],  # Use first persona for content generation
                         content_type=campaign_data["content_type"],
                         tone=campaign_data["tone"]
                     )
@@ -103,7 +105,7 @@ class CampaignCraftAI:
                         "content_type": campaign_data["content_type"],
                         "tone": campaign_data["tone"],
                         "content": content,
-                        "persona_role": campaign_data["persona"]["role"],
+                        "persona_roles": [p["role"] for p in campaign_data["personas"]],
                         "hashtags": campaign_data["hashtags"],
                         "tweet_url": None,  # Will be updated when posted
                         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -117,7 +119,9 @@ class CampaignCraftAI:
                     with st.expander("Campaign Details"):
                         st.write(f"**Content Type:** {campaign_data['content_type']}")
                         st.write(f"**Tone:** {campaign_data['tone']}")
-                        st.write(f"**Target Persona:** {campaign_data['persona']['role']}")
+                        st.write("**Target Personas:**")
+                        for persona in campaign_data['personas']:
+                            st.write(f"- {persona['role']}")
                         if campaign_data['hashtags']:
                             st.write(f"**Hashtags:** {', '.join(campaign_data['hashtags'])}")
 
@@ -133,6 +137,9 @@ class CampaignCraftAI:
                         )
                         st.text(twitter_content)
                         st.write(f"Character count: {len(twitter_content)}/280")
+        
+        elif page == "Analytics":
+            self.analytics_manager.show_analytics_dashboard()
         
         else:  # Content History
             self.show_content_history()
@@ -192,6 +199,12 @@ class CampaignCraftAI:
         with col2:
             st.subheader("📧 Email Campaign")
             st.info("Send this content via email")
+            
+            # Show selected personas
+            st.write("**Selected Personas:**")
+            for persona in campaign_data['personas']:
+                st.write(f"- {persona['role']}")
+            
             recipients = st.text_area(
                 "Email Recipients (one per line)",
                 help="Enter email addresses, one per line"
@@ -199,12 +212,20 @@ class CampaignCraftAI:
             
             if st.button("📨 Send Email Campaign", type="primary"):
                 email_content = self.social_media_manager.format_email(content)
-                if recipients and self.email_service.send_email(
-                    recipients.split('\n'),
+                
+                recipient_list = [r.strip() for r in recipients.split('\n') if r.strip()]
+                
+                if not recipient_list:
+                    st.error("Please enter at least one recipient email address.")
+                    return
+                
+                if self.email_service.send_email(
+                    recipient_list,
                     email_content["subject"],
                     email_content["body"]
                 ):
                     st.success("Email campaign sent successfully!")
+                    st.write(f"Sent to {len(recipient_list)} recipients")
                     st.balloons()
 
     def show_content_history(self):
@@ -218,7 +239,9 @@ class CampaignCraftAI:
         for item in reversed(st.session_state.content_history):
             with st.expander(f"{item['content_type']} - {item['created_at']}"):
                 st.write(f"**Campaign Goal:** {item['campaign_goal']}")
-                st.write(f"**Persona:** {item['persona_role']}")
+                st.write("**Target Personas:**")
+                for role in item['persona_roles']:
+                    st.write(f"- {role}")
                 st.write(f"**Tone:** {item['tone']}")
                 st.text(item['content'])
                 if item['hashtags']:

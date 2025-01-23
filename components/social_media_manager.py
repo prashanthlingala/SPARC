@@ -98,7 +98,7 @@ class SocialMediaManager:
             "body": email_content
         }
     
-    def post_to_twitter(self, content: str, hashtags: list) -> bool:
+    def post_to_twitter(self, content: str, hashtags: list) -> Dict:
         """Post content to Twitter"""
         try:
             if not hasattr(self, 'twitter_client'):
@@ -133,6 +133,20 @@ class SocialMediaManager:
             with st.spinner("Posting to Twitter..."):
                 tweet = self.twitter_client.update_status(optimized_content)
                 tweet_url = f"https://twitter.com/user/status/{tweet.id}"
+                
+                # Add mock metrics (replace with real API calls)
+                mock_metrics = {
+                    'impressions': 0,
+                    'clicks': 0,
+                    'conversions': 0,
+                    'roi': 0.0
+                }
+                st.session_state.analytics_manager.add_twitter_metrics(
+                    tweet.id, 
+                    optimized_content,
+                    mock_metrics
+                )
+                
                 return {"success": True, "url": tweet_url, "content": optimized_content}
         except Exception as e:
             if "duplicate" in str(e).lower():

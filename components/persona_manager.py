@@ -26,6 +26,7 @@ class PersonaManager:
                 "Preferred Content Style",
                 ["Technical", "Strategic", "Practical", "Theoretical"]
             )
+            
             pain_points = st.text_area(
                 "Key Pain Points",
                 placeholder="What challenges does this persona face?"
