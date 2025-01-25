@@ -11,7 +11,7 @@ class PersonaManager:
         st.subheader("Create Target Persona")
         
         with st.form("persona_form"):
-            name = st.text_input("Persona Name", placeholder="e.g., Tech Lead Sarah")
+            name = st.text_input("Persona Name", placeholder="e.g., Humans of Data")
             role = st.text_input("Role/Occupation", placeholder="e.g., Data Engineer, Analytics Manager")
             experience = st.selectbox(
                 "Experience Level",
