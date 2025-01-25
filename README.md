@@ -46,11 +46,11 @@ S.P.A.R.C is an AI-powered marketing campaign management platform that helps cre
 - Platform-specific analytics
 
 ## Technical Requirements 🔧
-python
-Python 3.8+
-Streamlit
-Azure OpenAI
-SQLite
+- python
+- Python 3.8+
+- Streamlit
+- Azure OpenAI
+- SQLite
 
 ## 🚀 Getting Started
 
