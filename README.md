@@ -1,6 +1,6 @@
 # S.P.A.R.C - Smart Personalised Automation for Remarkable Campaigns
 
-SPARC is an AI-powered marketing campaign content generator that helps create, manage, and distribute personalized content across multiple platforms.
+SPARC is an AI-powered marketing campaign generator that helps create, manage, and distribute personalized campaign content across multiple platforms.
 
 ## 🌟 Features
 
