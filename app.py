@@ -49,7 +49,7 @@ class CampaignCraftAI:
         
     def main(self):
         st.title("Smart Personalised Automation for Remarkable Campaigns (S.P.A.R.C)")
-        st.subheader("AI-Powered Marketing Campaign Content Generator")
+        st.subheader("AI-Powered Marketing Campaign Generator")
         
         with st.sidebar:
             st.header("Navigation")

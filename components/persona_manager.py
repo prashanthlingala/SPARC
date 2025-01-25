@@ -94,11 +94,19 @@ class PersonaManager:
             # Parse roles from JSON string with error handling
             try:
                 roles = json.loads(persona['role']) if isinstance(persona['role'], str) else [persona['role']]
-            except json.JSONDecodeError:
-                # Handle legacy data: convert single role to list
+                # Ensure roles is always a list
+                if not isinstance(roles, list):
+                    roles = [roles]
+                # Filter out any None or empty values
+                roles = [r for r in roles if r]
+            except (json.JSONDecodeError, TypeError):
+                # Handle legacy data or invalid JSON
                 roles = [persona['role']] if persona['role'] else []
             
-            with st.expander(f"📋 {persona['name']} - {', '.join(roles)}", expanded=False):
+            # Create a safe display string for roles
+            role_display = ', '.join(roles) if roles else 'No roles specified'
+            
+            with st.expander(f"📋 {persona['name']} - {role_display}", expanded=False):
                 # Display current values
                 st.write("**Roles:**")
                 for role in roles:
@@ -180,10 +188,17 @@ class PersonaManager:
             try:
                 # Try to parse as JSON
                 if isinstance(persona['role'], str):
-                    persona['role'] = json.loads(persona['role'])
-            except json.JSONDecodeError:
+                    roles = json.loads(persona['role'])
+                    # Ensure roles is always a list
+                    if not isinstance(roles, list):
+                        roles = [roles]
+                    # Filter out any None or empty values
+                    roles = [r for r in roles if r]
+                    persona['role'] = json.dumps(roles)
+            except (json.JSONDecodeError, TypeError):
                 # Handle legacy data: convert single role to JSON string
-                persona['role'] = json.dumps([persona['role']] if persona['role'] else [])
+                roles = [persona['role']] if persona['role'] else []
+                persona['role'] = json.dumps(roles)
         
         return personas
 

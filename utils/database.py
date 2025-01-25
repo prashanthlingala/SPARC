@@ -53,6 +53,7 @@ class Database:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     goal TEXT NOT NULL,
+                    industries TEXT,
                     status TEXT DEFAULT 'draft',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -268,3 +269,60 @@ class Database:
             except Exception as e:
                 print(f"Error deleting persona: {str(e)}")
                 return False 
+
+    def get_campaigns_with_content(self) -> List[Dict]:
+        """Get all campaigns with their content in a single query"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # First get all campaigns
+            cursor.execute('''
+                SELECT 
+                    c.id,
+                    c.name,
+                    c.goal,
+                    c.status,
+                    c.created_at,
+                    gc.id as content_id,
+                    gc.content_type,
+                    gc.tone,
+                    gc.content,
+                    gc.created_at as content_created_at,
+                    gc.twitter_content,
+                    gc.email_subject,
+                    gc.email_body
+                FROM campaigns c
+                LEFT JOIN generated_content gc ON c.id = gc.campaign_id
+                ORDER BY c.created_at DESC, gc.created_at DESC
+            ''')
+            
+            # Process results into a nested structure
+            campaigns = {}
+            for row in cursor.fetchall():
+                campaign_id = row[0]
+                
+                if campaign_id not in campaigns:
+                    campaigns[campaign_id] = {
+                        'id': row[0],
+                        'name': row[1],
+                        'goal': row[2],
+                        'status': row[3],
+                        'created_at': row[4],
+                        'content': []
+                    }
+                
+                # Add content if it exists
+                if row[5]:  # content_id exists
+                    content = {
+                        'id': row[5],
+                        'content_type': row[6],
+                        'tone': row[7],
+                        'content': row[8],
+                        'created_at': row[9],
+                        'twitter_content': row[10],
+                        'email_subject': row[11],
+                        'email_body': row[12]
+                    }
+                    campaigns[campaign_id]['content'].append(content)
+            
+            return list(campaigns.values()) 
