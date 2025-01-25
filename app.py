@@ -16,6 +16,7 @@ from components.analytics_manager import AnalyticsManager
 from utils.openai_helper import ContentGenerator
 from utils.config_loader import load_config
 from utils.db_manager import DatabaseManager
+from components.campaign_scheduler import CampaignScheduler
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -46,6 +47,7 @@ class CampaignCraftAI:
             self.config["email"]["smtp_port"]
         )
         self.analytics_manager = AnalyticsManager()
+        self.campaign_scheduler = CampaignScheduler()
         
     def main(self):
         st.title("Smart Personalised Automation for Remarkable Campaigns (S.P.A.R.C)")
@@ -53,9 +55,14 @@ class CampaignCraftAI:
         
         with st.sidebar:
             st.header("Navigation")
-            page = st.radio("Go to", ["Create Persona", "Generate Content", "Content Manager", "Analytics"])
+            page = st.radio(
+                "Go to",
+                ["Create Persona", "Generate Content", "Content Manager", "Campaign Scheduler", "Analytics"]
+            )
         
-        if page == "Create Persona":
+        if page == "Campaign Scheduler":
+            self.campaign_scheduler.show_scheduler()
+        elif page == "Create Persona":
             self.persona_manager.create_persona_form()
             self.persona_manager.display_personas()
             

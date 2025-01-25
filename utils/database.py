@@ -95,6 +95,21 @@ class Database:
                 )
             ''')
 
+            # Create campaign_schedules table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS campaign_schedules (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    content_id INTEGER,
+                    platform TEXT NOT NULL,
+                    scheduled_time TIMESTAMP NOT NULL,
+                    status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns (id),
+                    FOREIGN KEY (content_id) REFERENCES generated_content (id)
+                )
+            ''')
+
             conn.commit()
 
     # Persona Management
@@ -326,3 +341,48 @@ class Database:
                     campaigns[campaign_id]['content'].append(content)
             
             return list(campaigns.values()) 
+
+    def save_schedule(self, schedule_data: Dict) -> int:
+        """Save campaign schedule"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO campaign_schedules 
+                (campaign_id, content_id, platform, scheduled_time, status)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (
+                schedule_data['campaign_id'],
+                schedule_data['content_id'],
+                schedule_data['platform'],
+                schedule_data['scheduled_time'],
+                schedule_data.get('status', 'pending')
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_campaign_schedules(self, campaign_id: Optional[int] = None) -> List[Dict]:
+        """Get scheduled campaigns"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            if campaign_id:
+                query = '''
+                    SELECT cs.*, c.name as campaign_name, gc.content_type
+                    FROM campaign_schedules cs
+                    JOIN campaigns c ON cs.campaign_id = c.id
+                    JOIN generated_content gc ON cs.content_id = gc.id
+                    WHERE cs.campaign_id = ?
+                    ORDER BY cs.scheduled_time
+                '''
+                cursor.execute(query, (campaign_id,))
+            else:
+                query = '''
+                    SELECT cs.*, c.name as campaign_name, gc.content_type
+                    FROM campaign_schedules cs
+                    JOIN campaigns c ON cs.campaign_id = c.id
+                    JOIN generated_content gc ON cs.content_id = gc.id
+                    ORDER BY cs.scheduled_time
+                '''
+                cursor.execute(query)
+            
+            columns = [description[0] for description in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()] 
