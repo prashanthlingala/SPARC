@@ -56,7 +56,7 @@ class ContentGenerator:
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
-                max_tokens=500
+                max_tokens=2500
             )
             
             return response.choices[0].message.content.strip()
