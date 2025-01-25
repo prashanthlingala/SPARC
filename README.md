@@ -1,20 +1,56 @@
-# S.P.A.R.C - Smart Personalised Automation for Remarkable Campaigns
+# S.P.A.R.C - Smart Personalised Automation for Remarkable Campaigns 🎯
 
-SPARC is an AI-powered marketing campaign generator that helps create, manage, and distribute personalized campaign content across multiple platforms.
+S.P.A.R.C is an AI-powered marketing campaign management platform that helps create, manage, and automate personalized content across multiple channels.
 
-## 🌟 Features
+## Features 🌟
 
-- **AI-Powered Content Generation**: Leverages Azure OpenAI to create engaging content
-- **Persona Management**: Create and manage detailed target audience personas
-- **Multi-Platform Distribution**:
-  - Twitter integration for social media posting
-  - Email campaign management
-- **Campaign Analytics**: Track performance metrics across platforms
-  - Impressions
-  - Click-through rates
-  - Conversions
-  - ROI tracking
-- **Content History**: Maintain a record of all generated content with reusability options
+### 1. Persona Management 👥
+- Create and manage detailed target personas
+- Multiple role/occupation support
+- Experience level tracking
+- Technical proficiency assessment
+
+### 2. Content Generation 📝
+- AI-powered content creation
+- Multiple content types:
+  - Leadership Content
+  - Product Deep Dives
+  - Customer Stories
+  - Technical Documentation
+- Customizable tone settings
+- Industry-specific targeting
+- Hashtag and keyword optimization
+
+### 3. Campaign Scheduler ⏰
+- Schedule campaigns across multiple platforms
+- Supported platforms:
+  - Twitter 🐦
+  - Email 📧
+  - LinkedIn 💼
+  - Blog ✍️
+- Date and time scheduling
+- Campaign status tracking
+- Schedule management
+
+### 4. Content Manager 📚
+- Edit and update content
+- Platform-specific content optimization
+- Content version history
+- Multi-platform content preview
+- Real-time character count for social media
+
+### 5. Analytics Dashboard 📊
+- Campaign performance tracking
+- Engagement metrics
+- Content effectiveness analysis
+- Platform-specific analytics
+
+## Technical Requirements 🔧
+python
+Python 3.8+
+Streamlit
+Azure OpenAI
+SQLite
 
 ## 🚀 Getting Started
 
@@ -85,11 +121,17 @@ streamlit run app.py
    - Preview and post to Twitter
    - Send email campaigns
    - Track performance in analytics
+  
+4. **Schedule Campaigns**
+   - Schedule and Automate the campaigns
+   - Track the campaign status
 
-4. **Analytics**
+5. **Analytics**
    - View performance metrics
    - Track engagement across platforms
    - Monitor ROI and conversions
+  
+     
 
 ## 🔧 Configuration
 
