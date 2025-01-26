@@ -75,6 +75,7 @@ class CampaignManager:
     def create_campaign_form(self, personas: List[Dict]) -> Optional[Dict]:
         """Create form for campaign settings"""
         st.subheader("Campaign Settings")
+        st.markdown("Fields marked with * are mandatory")
         
         if not personas:
             st.error("Please create at least one persona first")
@@ -167,38 +168,38 @@ class CampaignManager:
         # Main campaign form
         with st.form("campaign_form"):
             campaign_name = st.text_input(
-                "Campaign Name",
+                "Campaign Name *",
                 placeholder="e.g., Q1 Product Launch"
             )
             
             campaign_goal = st.text_area(
-                "Campaign Goal",
+                "Campaign Goal *",
                 placeholder="e.g., Increase awareness of our new product features"
             )
             
             # Industry selection
             st.subheader("Additional Information")
             selected_industries = st.multiselect(
-                "Select Industries",
+                "Select Industries *",
                 options=st.session_state.suggested_industries,
                 default=[i for i in st.session_state.selected_industries if i in st.session_state.suggested_industries],
                 help="Choose target industries for your campaign"
             )
 
             selected_persona = st.selectbox(
-                "Target Persona",
+                "Target Persona *",
                 options=personas,
                 format_func=lambda x: x['name'],
                 help="Select the target persona for this campaign"
             )
             
             content_type = st.selectbox(
-                "Content Type",
+                "Content Type *",
                 self.content_types
             )
             
             tone = st.selectbox(
-                "Content Tone",
+                "Content Tone *",
                 self.tones
             )
 

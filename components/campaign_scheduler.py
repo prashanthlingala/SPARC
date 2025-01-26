@@ -32,10 +32,12 @@ class CampaignScheduler:
         self.show_scheduled_campaigns()
 
     def create_schedule_form(self, campaigns: List[Dict]):
+        st.markdown("Fields marked with * are mandatory")
+        
         with st.form("schedule_form"):
             # Campaign selection
             selected_campaign = st.selectbox(
-                "Select Campaign",
+                "Select Campaign *",
                 options=campaigns,
                 format_func=lambda x: f"{x['name']} ({x['created_at'][:10]})"
             )
@@ -44,7 +46,7 @@ class CampaignScheduler:
                 # Content selection
                 content_options = selected_campaign['content']
                 selected_content = st.selectbox(
-                    "Select Content",
+                    "Select Content *",
                     options=content_options,
                     format_func=lambda x: f"{x['content_type']} - {x['created_at'][:10]}"
                 )
@@ -53,7 +55,7 @@ class CampaignScheduler:
                 col1, col2 = st.columns(2)
                 with col1:
                     platforms = st.multiselect(
-                        "Select Platforms",
+                        "Select Platforms *",
                         options=list(self.platforms.keys()),
                         format_func=lambda x: self.platforms[x],
                         help="Select platforms for campaign delivery"
@@ -64,12 +66,12 @@ class CampaignScheduler:
                     min_date = datetime.now()
                     max_date = min_date + timedelta(days=365)
                     scheduled_date = st.date_input(
-                        "Select Date",
+                        "Select Date *",
                         min_value=min_date.date(),
                         max_value=max_date.date()
                     )
                     scheduled_time = st.time_input(
-                        "Select Time",
+                        "Select Time *",
                         value=datetime.now().replace(minute=0, second=0, microsecond=0)
                     )
 

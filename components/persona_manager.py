@@ -22,12 +22,13 @@ class PersonaManager:
     def create_persona_form(self) -> Optional[Dict]:
         """Display form for creating a new persona"""
         st.subheader("Create Target Persona")
+        st.markdown("Fields marked with * are mandatory")
         
         with st.form("persona_form"):
-            name = st.text_input("Persona Name", placeholder="e.g., Humans of Data")
+            name = st.text_input("Persona Name *", placeholder="e.g., Humans of Data")
             
             # Role selection with both predefined and custom options
-            st.subheader("Role/Occupation")
+            st.subheader("Role/Occupation *")
             col1, col2 = st.columns([2, 1])
             
             with col1:
