@@ -23,7 +23,7 @@ from utils.openai_helper import ContentGenerator
 class SocialMediaManager:
     def __init__(self, openai_client: ContentGenerator):
         self.openai_client = openai_client
-        self.twitter_char_limit = 280
+        self.twitter_char_limit = 500
         self.twitter_enabled = TWITTER_AVAILABLE
         self.twitter_client = None
         
